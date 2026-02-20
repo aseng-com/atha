@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alquran Rasyel - Final Edition</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-dark: #1e293b;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --ar-size: 2.2rem;
+        }
+
+        body.is-offline { --primary: #94a3b8; }
+        body.is-offline .menu-card { opacity: 0.6; filter: grayscale(1); }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            margin: 0;
+            transition: all 0.4s ease;
+        }
+
+        /* Running Text */
+        .marquee-bar {
+            background: var(--primary);
+            color: white;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            transition: 0.5s;
+        }
+
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 15px; }
+        .menu-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .menu-card:active { transform: scale(0.95); }
+
+        .icon-box {
+            width: 55px; height: 55px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px; font-size: 1.6rem;
+            transition: 0.5s;
+        }
+
+        /* Page Headers */
+        .page-header {
+            background: var(--bg-card);
+            padding: 1.2rem;
+            border-radius: 0 0 25px 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 18px;
+            margin: 0 15px 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .font-arabic { font-family: 'Amiri', serif; direction: rtl; line-height: 2.5; }
+
+        .app-page { display: none; min-height: 100vh; padding-bottom: 30px; }
+        .app-page.active { display: block; }
+
+        /* About Section Style */
+        .about-header {
+            background: linear-gradient(135deg, var(--primary), #059669);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 25px;
+            text-align: center;
+            margin: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-bar">
+        <marquee>Alquran Rasyel v5.0 Final • Terimakasih telah menggunakan aplikasi kami • Fitur Doa Harian dan About App telah diperbarui.</marquee>
+    </div>
+
+    <section id="page-home" class="app-page active">
+        <div class="container py-4">
+            <div class="mb-5 px-3 mt-3">
+                <h6 class="text-muted mb-1">Assalamualaikum,</h6>
+                <h2 class="fw-bold">Alquran <span class="text-success" id="brand-name">Rasyel</span></h2>
+            </div>
+
+            <div class="menu-grid">
+                <div class="menu-card" onclick="handleMenuClick('quran', 'Al-Quran')">
+                    <div class="icon-box"><i class="bi bi-book-half"></i></div>
+                    <span class="fw-bold">Al-Quran</span>
+                </div>
+                <div class="menu-card" onclick="handleMenuClick('doa', 'Doa Harian')">
+                    <div class="icon-box"><i class="bi bi-stars"></i></div>
+                    <span class="fw-bold">Doa Harian</span>
+                </div>
+                <div class="menu-card" onclick="navigateTo('about')">
+                    <div class="icon-box"><i class="bi bi-info-circle-fill"></i></div>
+                    <span class="fw-bold">About App</span>
+                </div>
+                <div class="menu-card" onclick="navigateTo('settings')">
+                    <div class="icon-box"><i class="bi bi-sliders"></i></div>
+                    <span class="fw-bold">Setting</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-quran" class="app-page">
+        <div class="page-header">
+            <div class="d-flex align-items-center mb-3">
+                <button class="btn btn-light rounded-circle me-3" onclick="handleBack()"><i class="bi bi-arrow-left"></i></button>
+                <h4 class="fw-bold mb-0">Daftar Surah</h4>
+            </div>
+            <input type="text" class="form-control border-0 bg-light rounded-4 p-3" id="quranSearch" placeholder="Cari surah...">
+        </div>
+        <div id="quran-list"></div>
+    </section>
+
+    <section id="page-reader" class="app-page">
+        <div class="page-header d-flex align-items-center">
+            <button class="btn btn-light rounded-circle me-3" onclick="handleBack()"><i class="bi bi-arrow-left"></i></button>
+            <div><h5 class="fw-bold mb-0" id="reader-title">...</h5><small class="text-muted" id="reader-subtitle">...</small></div>
+        </div>
+        <div class="container mt-3" id="reader-content"></div>
+    </section>
+
+    <section id="page-doa" class="app-page">
+        <div class="page-header d-flex align-items-center">
+            <button class="btn btn-light rounded-circle me-3" onclick="handleBack()"><i class="bi bi-arrow-left"></i></button>
+            <h4 class="fw-bold mb-0">Doa Harian</h4>
+        </div>
+        <div id="doa-list"></div>
+    </section>
+
+    <section id="page-about" class="app-page">
+        <div class="page-header d-flex align-items-center">
+            <button class="btn btn-light rounded-circle me-3" onclick="handleBack()"><i class="bi bi-arrow-left"></i></button>
+            <h4 class="fw-bold mb-0">Tentang Aplikasi</h4>
+        </div>
+        <div class="about-header shadow">
+            <i class="bi bi-patch-check-fill fs-1"></i>
+            <h3 class="fw-bold mt-2">Alquran Rasyel</h3>
+            <p class="small mb-0">Version 5.0.0 (Stable Edition)</p>
+        </div>
+        <div class="container mt-4">
+            <div class="item-card shadow-sm">
+                <h6 class="fw-bold text-success">Deskripsi</h6>
+                <p class="small text-muted">Alquran Rasyel adalah mushaf digital modern yang dirancang untuk memberikan kemudahan akses Al-Quran dan doa harian dengan antarmuka yang bersih dan profesional.</p>
+            </div>
+            <div class="item-card shadow-sm">
+                <h6 class="fw-bold text-success">Fitur Utama</h6>
+                <ul class="small text-muted ps-3 mb-0">
+                    <li>114 Surah lengkap dengan Audio</li>
+                    <li>Kumpulan Doa Harian Mustajab</li>
+                    <li>Sistem Deteksi Internet Otomatis</li>
+                    <li>Custom Ukuran Huruf Arab</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="page-settings" class="app-page">
+        <div class="page-header d-flex align-items-center">
+            <button class="btn btn-light rounded-circle me-3" onclick="handleBack()"><i class="bi bi-arrow-left"></i></button>
+            <h4 class="fw-bold mb-0">Setting</h4>
+        </div>
+        <div class="container mt-3 px-4">
+            <div class="p-4 bg-white rounded-4 shadow-sm mb-3">
+                <h6 class="fw-bold mb-3">Ukuran Huruf Arab</h6>
+                <input type="range" class="form-range" min="1.5" max="4" step="0.1" id="fontSlider" oninput="updateFont(this.value)">
+                <div class="text-center p-3 font-arabic" id="font-preview">بِسْمِ اللَّهِ</div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let surahData = [];
+        let doaData = [];
+        let activeAudio = null;
+
+        function updateStatus() {
+            if (navigator.onLine) {
+                document.body.classList.remove('is-offline');
+                if(surahData.length === 0) fetchData();
+            } else {
+                document.body.classList.add('is-offline');
+            }
+        }
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+
+        function handleMenuClick(target, label) {
+            if (!navigator.onLine) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Offline',
+                    text: `Menu ${label} memerlukan koneksi internet.`,
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+            navigateTo(target);
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            history.pushState({page: pageId}, "", "#" + pageId);
+            window.scrollTo(0,0);
+        }
+
+        window.onpopstate = (e) => {
+            const page = (e.state && e.state.page) ? e.state.page : 'home';
+            document.querySelectorAll('.app-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+        };
+
+        function handleBack() { window.history.back(); if(activeAudio) activeAudio.pause(); }
+
+        async function fetchData() {
+            if(!navigator.onLine) return;
+            try {
+                const [sq, sd] = await Promise.all([
+                    fetch('https://open-api.my.id/api/quran/surah'),
+                    fetch('https://open-api.my.id/api/doa')
+                ]);
+                surahData = await sq.json();
+                doaData = await sd.json();
+                renderSurahList(surahData);
+                renderDoaList(doaData);
+            } catch (e) { console.log("Error fetching"); }
+        }
+
+        function renderSurahList(data) {
+            const list = document.getElementById('quran-list');
+            list.innerHTML = data.map(s => `
+                <div class="item-card d-flex align-items-center" onclick="openReader(${s.nomor})">
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-0">${s.nomor}. ${s.nama_latin}</h6>
+                        <small class="text-muted">${s.arti}</small>
+                    </div>
+                    <div class="font-arabic text-success" style="font-size: 1.2rem;">${s.nama}</div>
+                </div>
+            `).join('');
+        }
+
+        async function openReader(no) {
+            navigateTo('reader');
+            const container = document.getElementById('reader-content');
+            container.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-success"></div></div>';
+            const res = await fetch(`https://open-api.my.id/api/quran/surah/${no}`);
+            const data = await res.json();
+            document.getElementById('reader-title').innerText = data.nama_latin;
+            document.getElementById('reader-subtitle').innerText = data.arti;
+            container.innerHTML = data.ayat.map(a => `
+                <div class="p-4 bg-white rounded-4 mb-3 shadow-sm border-bottom">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="badge bg-light text-dark border">${a.nomor}</span>
+                        <i class="bi bi-play-circle-fill text-success fs-3" onclick="playAudio('${a.audio}')"></i>
+                    </div>
+                    <h2 class="font-arabic text-end mb-3" style="font-size: var(--ar-size)">${a.ar}</h2>
+                    <p class="text-muted small">${a.idn}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderDoaList(data) {
+            document.getElementById('doa-list').innerHTML = data.map(d => `
+                <div class="item-card shadow-sm">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="bi bi-stars text-success me-2"></i>
+                        <h6 class="fw-bold mb-0">${d.judul}</h6>
+                    </div>
+                    <p class="font-arabic text-end mb-3" style="font-size: 1.5rem">${d.arab}</p>
+                    <div class="p-3 bg-light rounded-3 small text-muted">"${d.terjemah}"</div>
+                </div>
+            `).join('');
+        }
+
+        function playAudio(url) {
+            if(activeAudio) activeAudio.pause();
+            activeAudio = new Audio(url);
+            activeAudio.play();
+        }
+
+        function updateFont(val) { 
+            document.documentElement.style.setProperty('--ar-size', val + 'rem'); 
+            document.getElementById('font-preview').style.fontSize = val + 'rem';
+        }
+
+        updateStatus();
+        fetchData();
+        history.replaceState({page: 'home'}, "", "#home");
+    </script>
+</body>
+</html>
